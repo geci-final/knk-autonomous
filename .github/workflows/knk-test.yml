@@ -1,6 +1,6 @@
 name: KnkTest on conda env
 
-on: [push]
+on: [push,pull_request]
 
 jobs:
   build-linux:
