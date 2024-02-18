@@ -16,7 +16,7 @@ jobs:
         python-version: '3.11'
     - name: Add conda to PATH
       run: |
-        echo "%CONDA%/Scripts" >> $env:GITHUB_PATH
+        Add-Content $env:GITHUB_PATH "%CONDA%/Scripts"
     - name: Install dependencies
       run: |
         conda env update --file environment.yml --name base
