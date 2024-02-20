@@ -1,0 +1,14 @@
+scikit-image
+PyYAML
+tqdm
+scikit-learn
+pytorch-lightning
+opencv-python
+hydra-core
+numpy
+numba
+imageio
+protobuf
+transformers
+plotly
+torchmetrics
