@@ -162,3 +162,10 @@ cython_debug/
 .vscode
 .vscode/*
 _build_test.ipynb
+images
+test_vid
+
+*__pycache__*
+.ipynb_checkpoints
+*.ckpt
+gradio*
