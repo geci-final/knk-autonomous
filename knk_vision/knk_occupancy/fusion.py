@@ -13,6 +13,7 @@ import numpy as np
 
 from numba import njit, prange
 from skimage import measure
+from numba import cuda
 
 FUSION_GPU_MODE = 0
 

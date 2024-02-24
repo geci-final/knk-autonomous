@@ -169,3 +169,5 @@ test_vid
 .ipynb_checkpoints
 *.ckpt
 gradio*
+
+*.sarif

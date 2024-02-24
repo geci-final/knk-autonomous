@@ -7,6 +7,7 @@ from monoscene.flosp import FLoSP
 import numpy as np
 import torch.nn.functional as F
 from monoscene.unet2d import UNet2D
+import time
 
 
 class MonoScene(pl.LightningModule):
@@ -75,22 +76,28 @@ class MonoScene(pl.LightningModule):
 
     def forward(self, batch):
 
-        img = batch["img"]
+        img = batch["img"].cuda()
         bs = len(img)
 
         out = {}
 
+        start_rgb = time.time()
         x_rgb = self.net_rgb(img)
+        end_rgb = time.time()
+        print(f"RGB Time: {end_rgb-start_rgb:.2f} seconds")
 
         x3ds = []
+        start_feat3d = time.time()
         for i in range(bs):
             x3d = None
             for scale_2d in self.project_res:
 
                 # project features at each 2D scale to target 3D scale
                 scale_2d = int(scale_2d)
-                projected_pix = batch["projected_pix_{}".format(self.project_scale)][i]#.cuda()
-                fov_mask = batch["fov_mask_{}".format(self.project_scale)][i]#.cuda()
+                projected_pix = batch["projected_pix_{}".format(
+                    self.project_scale)][i].cuda()
+                fov_mask = batch["fov_mask_{}".format(
+                    self.project_scale)][i].cuda()
 
                 # Sum all the 3D features
                 if x3d is None:
@@ -108,18 +115,19 @@ class MonoScene(pl.LightningModule):
                         fov_mask,
                     )
             x3ds.append(x3d)
-
+        end_feat3d = time.time()
+        print(f"Feat3D Time: {end_feat3d-start_feat3d:.2f} seconds")
         input_dict = {
             "x3d": torch.stack(x3ds),
         }
-
+        start_3d = time.time()
         out_dict = self.net_3d_decoder(input_dict)
+        end_3d = time.time()
+        print(f"3D Time: {end_3d-start_3d:.2f} seconds")
 
         ssc_pred = out_dict["ssc_logit"]
-    
+
         y_pred = ssc_pred.detach().cpu().numpy()
         y_pred = np.argmax(y_pred, axis=1)
 
         return y_pred
-
-
