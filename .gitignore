@@ -172,3 +172,4 @@ gradio*
 
 *.sarif
 *.mp4
+*.pt
