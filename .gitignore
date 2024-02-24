@@ -171,3 +171,4 @@ test_vid
 gradio*
 
 *.sarif
+*.mp4
