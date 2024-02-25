@@ -173,4 +173,5 @@ gradio*
 *.sarif
 *.mp4
 *.pt
+*.pth
 vidar
