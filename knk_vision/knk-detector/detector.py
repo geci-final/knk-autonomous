@@ -4,6 +4,8 @@ import cv2
 import numpy as np
 from ultralytics import RTDETR
 from typing import List, Tuple, Optional
+from vidar.utils.config import read_config
+from vidar.utils.setup import setup_arch
 
 
 class KnkVision:
@@ -96,25 +98,32 @@ class KnkVision:
         # torch.hub.help("intel-isl/MiDaS", "DPT_BEiT_L_384", force_reload=True)
         # fix for timm>=0.9.8
         # issue : https://github.com/isl-org/ZoeDepth/issues/82
-        self.zoe = torch.hub.load(
-            "isl-org/ZoeDepth", "ZoeD_K", pretrained=False)
-        pretrained_dict = torch.hub.load_state_dict_from_url(
-            'https://github.com/isl-org/ZoeDepth/releases/download/v1.0/ZoeD_M12_K.pt', map_location='cpu')
-        self.zoe.load_state_dict(pretrained_dict['model'], strict=False)
-        for b in self.zoe.core.core.pretrained.model.blocks:
-            b.drop_path = torch.nn.Identity()
-        self.zoe.to(self.device)
-        self.zoe.eval()
+        # self.zoe = torch.hub.load(
+        #     "isl-org/ZoeDepth", "ZoeD_K", pretrained=False)
+        # pretrained_dict = torch.hub.load_state_dict_from_url(
+        #     'https://github.com/isl-org/ZoeDepth/releases/download/v1.0/ZoeD_M12_K.pt', map_location='cpu')
+        # self.zoe.load_state_dict(pretrained_dict['model'], strict=False)
+        # for b in self.zoe.core.core.pretrained.model.blocks:
+        #     b.drop_path = torch.nn.Identity()
+        # self.zoe.to(self.device)
+        # self.zoe.eval()
+        packnet_cfg = read_config('packnet_config.yaml')
+        self.packnet = setup_arch(packnet_cfg.arch, verbose=True)
+        state_dict = torch.load(
+            'PackNet_MR_selfsup_KITTI.ckpt', map_location="cpu")
+        self.packnet.load_state_dict(state_dict["state_dict"], strict=False)
+        self.packnet.to(self.device)
+        self.packnet.eval()
 
     def depth(self, img: np.ndarray) -> np.ndarray:
         start_time = time.time()
         img /= 255.0
         img = torch.from_numpy(img).permute(
             2, 0, 1).unsqueeze(0).to(self.device)
-        depth = self.zoe.infer(img)
-        depth = depth.squeeze().detach().cpu().numpy()
+        depth = self.packnet(img)
+        depth = depth[0].squeeze().detach().cpu().numpy()
         end_time = time.time()
-        print(f'Inference time for ZoeDepth : {end_time-start_time:.2f}s')
+        print(f'Inference time for Vidar : {end_time-start_time:.2f}s')
         return depth
 
     def detect(self, img: np.ndarray):
@@ -157,9 +166,9 @@ class KnkVision:
 
 
 def main():
-    vid_path = 'test_cam0.mp4'
+    # vid_path = 'test_cam0.mp4'
     vision = KnkVision()
-    cap = cv2.VideoCapture(vid_path)
+    cap = cv2.VideoCapture(0)
     if cap.isOpened():
         while True:
             ret, frame = cap.read()
