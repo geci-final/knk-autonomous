@@ -2,10 +2,10 @@
 
 ![knk_logo](assets/knk.png)
 
-K and K Autonomous is an autonomous driving system that leverages the power of Occupancy Networks and Reinforcement Learning-based planning. The system is designed to assist in driving by maintaining lane centering and providing driving assistance.
+K and K Autonomous is an autonomous driving system that leverages the Deep Learning methods for depth estimation,object detection,lane segmentation and Rule-based planning. The system is designed to assist in driving by maintaining lane centering and providing driving assistance.
 
 # Knk-Vision
-KNK-Vision is a computer vision module used for vehicle detection, lane detection, and depth estimation from monocular camera images.KNK-Vision uses the [**YOLOP**](https://github.com/hustvl/YOLOP) for real-time lane and vehicle detection. Depth estimation is done using [**Vidar**](https://github.com/TRI-ML/vidar)
+KNK-Vision is a computer vision module used for vehicle detection, lane detection, and depth estimation from monocular camera images.KNK-Vision uses the [**YOLOP**](https://github.com/hustvl/YOLOP) for real-time lane segmentation and vehicle detection. Depth estimation is done using [**Vidar**](https://github.com/TRI-ML/vidar)
 ### Demo
 ![example](assets/example.jpg)
 #### After inference
