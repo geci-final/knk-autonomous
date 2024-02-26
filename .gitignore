@@ -175,3 +175,8 @@ gradio*
 *.pt
 *.pth
 vidar
+inference
+yolo_test.py
+example.jpg
+weights
+runs
