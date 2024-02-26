@@ -63,6 +63,7 @@ class KnkVision:
         return depth
 
     def yolop_infer(self, img_det: np.ndarray):
+        start_preprocess = time.time()
         img, ratio, pad = letterbox_for_img(img_det)
         h0, w0 = img_det.shape[:2]
         h, w = img.shape[:2]
@@ -71,8 +72,10 @@ class KnkVision:
         img = self._l_d_transform(img).to(self.device)
         img = img.unsqueeze(0)
         print("lane image shape : ", img.shape)
+        end_preprocess = time.time()
         with torch.no_grad():
             det_out, da_seg_out, ll_seg_out = self.yolop(img)
+        end_inference = time.time()
         inf_out, _ = det_out
         det_pred = non_max_suppression(
             inf_out, conf_thres=self.yolop_conf, iou_thres=self.yolop_iou, classes=None, agnostic=False)
@@ -101,7 +104,8 @@ class KnkVision:
         if len(det):
             det[:, :4] = scale_coords(
                 img.shape[2:], det[:, :4], img_det.shape).round()
-
+        stop_postprocess = time.time()
+        print(f"yolop preprocess time : {(end_preprocess-start_preprocess)*100:.2f}ms , yolop inference time : {(end_inference-end_preprocess)*100:.2f}ms , yolop postprocess time : {(stop_postprocess-end_inference)*100:.2f}ms")
         return det, da_seg_mask, ll_seg_mask
 
     def calc_dist(self, depth: np.ndarray, xyxy: List[int]) -> float:
