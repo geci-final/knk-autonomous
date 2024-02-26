@@ -173,4 +173,8 @@ gradio*
 *.sarif
 *.mp4
 *.pt
+*.pth
+yolo_test.py
+weights
+runs
 vidar
