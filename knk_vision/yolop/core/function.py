@@ -1,8 +1,8 @@
 import time
-from yolop.core.evaluate import ConfusionMatrix, SegmentationMetric
-from yolop.core.general import non_max_suppression, check_img_size, scale_coords, xyxy2xywh, xywh2xyxy, box_iou, coco80_to_coco91_class, plot_images, ap_per_class, output_to_target
-from yolop.utils.utils import time_synchronized
-from yolop.utils import plot_img_and_mask, plot_one_box, show_seg_result
+from knk_vision.yolop.core.evaluate import ConfusionMatrix, SegmentationMetric
+from knk_vision.yolop.core.general import non_max_suppression, check_img_size, scale_coords, xyxy2xywh, xywh2xyxy, box_iou, coco80_to_coco91_class, plot_images, ap_per_class, output_to_target
+from knk_vision.yolop.utils.utils import time_synchronized
+from knk_vision.yolop.utils import plot_img_and_mask, plot_one_box, show_seg_result
 import torch
 from threading import Thread
 import numpy as np

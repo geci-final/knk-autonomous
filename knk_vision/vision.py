@@ -6,10 +6,11 @@ import numpy as np
 import torchvision.transforms as transforms
 from ultralytics import RTDETR
 from typing import List, Tuple, Optional
-from vidar.utils.config import read_config
-from vidar.utils.setup import setup_arch
-from yolop.core.general import non_max_suppression, scale_coords
-from yolop.utils.augmentations import letterbox_for_img
+from knk_vision.vidar.utils.config import read_config
+from knk_vision.vidar.utils.setup import setup_arch
+from knk_vision.yolop.core.general import non_max_suppression, scale_coords
+from knk_vision.yolop.utils.augmentations import letterbox_for_img
+from knk_vision.yolop.utils.plot import show_seg_result
 from PIL import Image
 
 
@@ -30,10 +31,10 @@ class KnkVision:
         self.cls_colors = [[random.randint(0, 255) for _ in range(
             3)] for _ in range(len(self.cls_names))]
 
-        packnet_cfg = read_config('configs/packnet_config.yaml')
+        packnet_cfg = read_config('knk_vision/configs/packnet_config.yaml')
         self.packnet = setup_arch(packnet_cfg.arch, verbose=True)
         state_dict = torch.load(
-            'weights/PackNet_MR_selfsup_KITTI.ckpt', map_location=self.device)
+            'knk_vision/weights/PackNet_MR_selfsup_KITTI.ckpt', map_location=self.device)
         self.packnet.load_state_dict(state_dict["state_dict"], strict=False)
         self.packnet.to(self.device)
         self.packnet.eval()
@@ -54,7 +55,6 @@ class KnkVision:
         preprocess_start = time.time()
         img = self._depth_transform(img).to(self.device)
         preprocess_end = time.time()
-        print("depth img shape : ", img.shape)
         depth = self.packnet(img)
         depth = depth[0].squeeze().detach().cpu().numpy()
         depth_end = time.time()
@@ -71,7 +71,6 @@ class KnkVision:
         img = np.ascontiguousarray(img)
         img = self._l_d_transform(img).to(self.device)
         img = img.unsqueeze(0)
-        print("lane image shape : ", img.shape)
         end_preprocess = time.time()
         with torch.no_grad():
             det_out, da_seg_out, ll_seg_out = self.yolop(img)
@@ -108,6 +107,10 @@ class KnkVision:
         print(f"yolop preprocess time : {(end_preprocess-start_preprocess)*100:.2f}ms , yolop inference time : {(end_inference-end_preprocess)*100:.2f}ms , yolop postprocess time : {(stop_postprocess-end_inference)*100:.2f}ms")
         return det, da_seg_mask, ll_seg_mask
 
+    def draw_seg(self, frame: np.ndarray, seg_masks: Tuple[np.ndarray, np.ndarray]) -> np.ndarray:
+        return show_seg_result(
+            frame, seg_masks, dsize=(self.width, self.height))
+
     def calc_dist(self, depth: np.ndarray, xyxy: List[int]) -> float:
         x1, y1, x2, y2 = xyxy
         dist = depth[y1:y2, x1:x2].mean()
@@ -126,7 +129,6 @@ class KnkVision:
         # lane_line_mask:tensor
         # }
         det, da_seg, ll_seg = self.yolop_infer(frame)
-        print("det : ", det)
         obj_det = []
         if len(det):
             depth = self.depth(frame)
@@ -147,38 +149,3 @@ class KnkVision:
             'drive_area_mask': da_seg,
             'lane_line_mask': ll_seg
         }
-
-
-def main():
-    vid_path = "test_vid/test_vid.mp4"
-    # vid_path = "example.jpg"
-    vision = KnkVision()
-    cap = cv2.VideoCapture(vid_path)
-    if cap.isOpened():
-        while True:
-            ret, frame = cap.read()
-            if ret:
-                frame = cv2.resize(frame, (vision.width, vision.height))
-                vision_res = vision.vision_analyze(frame)
-                print("vision res : ", vision_res)
-                res_objects = vision_res['obj_det']
-                if res_objects:
-                    for obj in res_objects:
-                        cls_name = obj['class_name']
-                        xyxy = obj['bounding_box']
-                        x1, y1, x2, y2 = xyxy
-                        cv2.rectangle(frame, (x1, y1),
-                                      (x2, y2), (0, 255, 0), 2)
-                        dist = obj['distance']
-                        cv2.putText(frame, f'[{cls_name}] || {dist:.2f}m', (int(x1+3), int(
-                            y1+3)), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
-                cv2.imshow('Knk-Vision', frame)
-                if cv2.waitKey(1) & 0xFF == ord('q'):
-                    break
-            else:
-                break
-    cap.release()
-
-
-if __name__ == '__main__':
-    main()

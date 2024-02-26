@@ -1,9 +1,9 @@
-from yolop.utils.utils import time_synchronized
-from yolop.core.evaluate import SegmentationMetric
-from yolop.utils import check_anchor_order
+from knk_vision.yolop.utils.utils import time_synchronized
+from knk_vision.yolop.core.evaluate import SegmentationMetric
+from knk_vision.yolop.utils import check_anchor_order
 from torch.nn import Upsample
-from yolop.models.common import Conv, SPP, Bottleneck, BottleneckCSP, Focus, Concat, Detect, SharpenConv
-from yolop.utils import initialize_weights
+from knk_vision.yolop.models.common import Conv, SPP, Bottleneck, BottleneckCSP, Focus, Concat, Detect, SharpenConv
+from knk_vision.yolop.utils import initialize_weights
 import torch
 from torch import tensor
 import torch.nn as nn

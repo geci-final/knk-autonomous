@@ -5,7 +5,7 @@ import torch
 import yaml
 from scipy.cluster.vq import kmeans
 from tqdm import tqdm
-from yolop.utils import is_parallel
+from knk_vision.yolop.utils import is_parallel
 
 
 def check_anchor_order(m):

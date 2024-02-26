@@ -1,5 +1,5 @@
 import torch
-from yolop.utils import is_parallel
+from knk_vision.yolop.utils import is_parallel
 import numpy as np
 np.set_printoptions(threshold=np.inf)
 import cv2

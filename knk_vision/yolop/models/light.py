@@ -6,14 +6,14 @@ import sys,os
 import math
 import sys
 sys.path.append(os.getcwd())
-from yolop.utils import initialize_weights
+from knk_vision.yolop.utils import initialize_weights
 # from lib.models.common2 import DepthSeperabelConv2d as Conv
 # from lib.models.common2 import SPP, Bottleneck, BottleneckCSP, Focus, Concat, Detect
-from yolop.models.common import Conv, SPP, Bottleneck, BottleneckCSP, Focus, Concat, Detect
+from knk_vision.yolop.models.common import Conv, SPP, Bottleneck, BottleneckCSP, Focus, Concat, Detect
 from torch.nn import Upsample
-from yolop.utils import check_anchor_order
-from yolop.core.evaluate import SegmentationMetric
-from yolop.utils.utils import time_synchronized
+from knk_vision.yolop.utils import check_anchor_order
+from knk_vision.yolop.core.evaluate import SegmentationMetric
+from knk_vision.yolop.utils.utils import time_synchronized
 
 CSPDarknet_s = [
 [ -1, Focus, [3, 32, 3]],
