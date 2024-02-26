@@ -1,8 +1,0 @@
-opencv-python
-tqdm
-tensorboard
-addict
-scikit-learn
-pathspec
-imagesize
-ujson
