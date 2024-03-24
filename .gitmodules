@@ -1,0 +1,3 @@
+[submodule "knk_drive/ml-fastvit"]
+	path = knk_drive/ml-fastvit
+	url = https://github.com/v4zha/ml-fastvit.git
