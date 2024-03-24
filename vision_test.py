@@ -17,15 +17,7 @@ def main():
                 frame = vision.draw_seg(frame, (da_seg_mask, ll_seg_mask))
                 res_objects = vision_res['obj_det']
                 if res_objects:
-                    for obj in res_objects:
-                        cls_name = obj['class_name']
-                        xyxy = obj['bounding_box']
-                        x1, y1, x2, y2 = xyxy
-                        cv2.rectangle(frame, (x1, y1),
-                                      (x2, y2), (0, 255, 0), 2)
-                        dist = obj['distance']
-                        cv2.putText(frame, f'{dist:.2f}m', (int(x1+3), int(
-                            y1+3)), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+                    vision.draw_obj(frame, res_objects)
                 cv2.imshow('Knk-Vision', frame)
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
