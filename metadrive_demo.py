@@ -25,7 +25,7 @@ def main():
         o, i = env.reset()
         frame = o["image"][..., -1]
         cv2.imshow('Knk-Vision-sim', frame)
-        for i in range(20000):
+        for i in range(2000):
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
             o, r, d, _, _ = env.step(env.action_space.sample())
