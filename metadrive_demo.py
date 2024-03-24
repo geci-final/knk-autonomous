@@ -1,4 +1,4 @@
-from knk_vision import KnkVision
+from knk_vision.vision import KnkVision
 from metadrive import MetaDriveEnv
 from metadrive.policy.idm_policy import IDMPolicy
 from metadrive.component.sensors.rgb_camera import RGBCamera
@@ -6,7 +6,7 @@ import cv2
 
 
 def main():
-    vision=KnkVision()
+    vision = KnkVision()
     res = (800, 600)
     config = dict(
         num_scenarios=100,
@@ -30,6 +30,14 @@ def main():
                 break
             o, r, d, _, _ = env.step(env.action_space.sample())
             frame = o["image"][..., -1]
+            frame = cv2.resize(frame, (vision.width, vision.height))
+            vision_res = vision.vision_nodist(frame)
+            da_seg_mask = vision_res['drive_area_mask']
+            ll_seg_mask = vision_res['lane_line_mask']
+            frame = vision.draw_seg(frame, (da_seg_mask, ll_seg_mask))
+            res_objects = vision_res['obj_det']
+            if res_objects:
+                vision.draw_obj(frame, res_objects)
             cv2.imshow('Knk-Vision-sim', frame)
             cv2.waitKey(1)
             if d:
