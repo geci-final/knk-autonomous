@@ -6,8 +6,8 @@ import numpy as np
 import torchvision.transforms as transforms
 from ultralytics import RTDETR
 from typing import List, Tuple, Optional
-from knk_vision.vidar.utils.config import read_config
-from knk_vision.vidar.utils.setup import setup_arch
+from knk_vision.vidar.vidar.utils.config import read_config
+from knk_vision.vidar.vidar.utils.setup import setup_arch
 from knk_vision.yolop.core.general import non_max_suppression, scale_coords
 from knk_vision.yolop.utils.augmentations import letterbox_for_img
 from knk_vision.yolop.utils.plot import show_seg_result
@@ -59,7 +59,7 @@ class KnkVision:
         depth = depth[0].squeeze().detach().cpu().numpy()
         depth_end = time.time()
         print(
-            f'Preprocess time : {(preprocess_end-preprocess_start)*100:.2f}ms , Inference time for Vidar : {(depth_end-preprocess_end)*100:.2f}ms')
+            f'Preprocess time : {(preprocess_end-preprocess_start):.2f}s , Inference time for Vidar : {(depth_end-preprocess_end):.2f}s')
         return depth
 
     def yolop_infer(self, img_det: np.ndarray):
@@ -104,7 +104,7 @@ class KnkVision:
             det[:, :4] = scale_coords(
                 img.shape[2:], det[:, :4], img_det.shape).round()
         stop_postprocess = time.time()
-        print(f"yolop preprocess time : {(end_preprocess-start_preprocess)*100:.2f}ms , yolop inference time : {(end_inference-end_preprocess)*100:.2f}ms , yolop postprocess time : {(stop_postprocess-end_inference)*100:.2f}ms")
+        print(f"yolop preprocess time : {(end_preprocess-start_preprocess):.2f}s , yolop inference time : {(end_inference-end_preprocess):.2f}s , yolop postprocess time : {(stop_postprocess-end_inference):.2f}s")
         return det, da_seg_mask, ll_seg_mask
 
     def draw_seg(self, frame: np.ndarray, seg_masks: Tuple[np.ndarray, np.ndarray]) -> np.ndarray:
@@ -149,3 +149,44 @@ class KnkVision:
             'drive_area_mask': da_seg,
             'lane_line_mask': ll_seg
         }
+
+    def vision_nodist(self, frame: np.ndarray) -> Optional[List]:
+        # type Det= #{
+        # class_name,
+        # bounding_box
+        # dimensions,
+        # }
+        # return {
+        # obj_det:List[Det],
+        # drive_area_mask:tensor,
+        # lane_line_mask:tensor
+        # }
+        det, da_seg, ll_seg = self.yolop_infer(frame)
+        obj_det = []
+        if len(det):
+            for *xyxy, conf, cls in reversed(det):
+                cls_name = self.cls_names[int(cls)]
+                if conf > self.yolop_conf:
+                    x1, y1, x2, y2 = xyxy
+                    obj_det.append({
+                        'class_name': cls_name,
+                        'bounding_box': (int(x1), int(y1), int(x2), int(y2))
+                    })
+
+        return {
+            'obj_det': obj_det,
+            'drive_area_mask': da_seg,
+            'lane_line_mask': ll_seg
+        }
+
+    def draw_obj(self,frame: np.ndarray, res_objects, dist=True):
+        for obj in res_objects:
+            # cls_name = obj['class_name']
+            xyxy = obj['bounding_box']
+            x1, y1, x2, y2 = xyxy
+            cv2.rectangle(frame, (x1, y1),
+                          (x2, y2), (0, 255, 0), 2)
+            if dist:
+                dist = obj['distance']
+                cv2.putText(frame, f'{dist:.2f}m', (int(x1+3), int(
+                    y1+3)), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
