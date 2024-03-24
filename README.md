@@ -11,6 +11,9 @@ KNK-Vision is a computer vision module used for vehicle detection, lane detectio
 #### After inference
 ![infer_res](assets/result.jpg)
 
+#### MetaDrive inference
+![meta_infer](assets/metadrive.png)
+
 ## Installation
 
 Follow these steps to set up the KNK-Vision environment and install the necessary dependencies:

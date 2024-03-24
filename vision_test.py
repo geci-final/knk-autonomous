@@ -1,9 +1,13 @@
 import cv2
+import os
 from knk_vision.vision import KnkVision
 
 
 def main():
-    vid_path = "knk_vision/test_vid/test_cam1.mp4"
+    vid_path = "test_vid/test_vid1.mp4"
+    if not os.path.exists(vid_path):
+        print(f"Video file not found: {vid_path}")
+        return
     vision = KnkVision()
     cap = cv2.VideoCapture(vid_path)
     if cap.isOpened():

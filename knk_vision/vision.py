@@ -59,7 +59,7 @@ class KnkVision:
         depth = depth[0].squeeze().detach().cpu().numpy()
         depth_end = time.time()
         print(
-            f'Preprocess time : {(preprocess_end-preprocess_start)*100:.2f}ms , Inference time for Vidar : {(depth_end-preprocess_end)*100:.2f}ms')
+            f'Preprocess time : {(preprocess_end-preprocess_start):.2f}s , Inference time for Vidar : {(depth_end-preprocess_end):.2f}s')
         return depth
 
     def yolop_infer(self, img_det: np.ndarray):
@@ -104,7 +104,7 @@ class KnkVision:
             det[:, :4] = scale_coords(
                 img.shape[2:], det[:, :4], img_det.shape).round()
         stop_postprocess = time.time()
-        print(f"yolop preprocess time : {(end_preprocess-start_preprocess)*100:.2f}ms , yolop inference time : {(end_inference-end_preprocess)*100:.2f}ms , yolop postprocess time : {(stop_postprocess-end_inference)*100:.2f}ms")
+        print(f"yolop preprocess time : {(end_preprocess-start_preprocess):.2f}s , yolop inference time : {(end_inference-end_preprocess):.2f}s , yolop postprocess time : {(stop_postprocess-end_inference):.2f}s")
         return det, da_seg_mask, ll_seg_mask
 
     def draw_seg(self, frame: np.ndarray, seg_masks: Tuple[np.ndarray, np.ndarray]) -> np.ndarray:
@@ -179,7 +179,7 @@ class KnkVision:
             'lane_line_mask': ll_seg
         }
 
-    def draw_obj(frame: np.ndarray, res_objects, dist=True):
+    def draw_obj(self,frame: np.ndarray, res_objects, dist=True):
         for obj in res_objects:
             # cls_name = obj['class_name']
             xyxy = obj['bounding_box']
@@ -189,7 +189,4 @@ class KnkVision:
             if dist:
                 dist = obj['distance']
                 cv2.putText(frame, f'{dist:.2f}m', (int(x1+3), int(
-                    y1+3)), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
-            else:
-                cv2.putText(frame, (int(x1+3), int(
                     y1+3)), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
