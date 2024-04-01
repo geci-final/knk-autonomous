@@ -26,13 +26,18 @@ Follow these steps to set up the KNK-Vision environment and install the necessar
     cd knk-autonomous
     ```
 
-3. If you haven't already, [install conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html).
+3. clone the submodules
+```bash
+    git submodule update --init --recursive
+```
 
-4. Create a new conda environment from the `environment.yaml` file:
+4. If you haven't already, [install conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html).
+
+5. Create a new conda environment from the `environment.yaml` file:
     ```bash
     conda env create -f environment.yml
     ```
-5. Activate the new environment:
+6. Activate the new environment:
     ```bash
     conda activate knk-autonomous
     ```
