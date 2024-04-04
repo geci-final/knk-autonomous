@@ -24,6 +24,8 @@ jobs:
         activate-environment: knk-autonomous
         environment-file: environment.yml
         auto-activate-base: false
+    - name: clone submodules
+      run: git submodule update --init --recursive
     - name: Lint with flake8
       run: |
         conda install flake8

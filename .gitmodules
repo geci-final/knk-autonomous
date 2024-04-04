@@ -1,6 +1,6 @@
-[submodule "knk_drive/ml-fastvit"]
-	path = knk_drive/ml-fastvit
-	url = https://github.com/v4zha/ml-fastvit.git
 [submodule "knk_vision/vidar"]
 	path = knk_vision/vidar
-	url = https://github.com/v4zha/vidar.git
+	url = https://github.com/geci-final/vidar.git
+[submodule "knk_drive/ml-fastvit"]
+	path = knk_drive/ml-fastvit
+	url = https://github.com/geci-final/ml-fastvit.git
